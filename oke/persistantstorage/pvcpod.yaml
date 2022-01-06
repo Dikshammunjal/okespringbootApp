@@ -15,4 +15,4 @@ spec:
   volumes:
     - name: data
       persistentVolumeClaim:
-        claimName: myvolume22
+        claimName: mybackupvolume
