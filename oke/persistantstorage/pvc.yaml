@@ -1,7 +1,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: myvolume22
+  name: mybackupvolume
   annotations:
     volume.beta.kubernetes.io/oci-volume-source: ocid1.volume.oc1.eu-frankfurt-1.abtheljsyr6afas6r4gflgnhrxlhsheu252pdkkxi52vgwlbczzgdp75c2nq
 spec:
