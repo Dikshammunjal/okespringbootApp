@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oke-sb-demo
+spec:
+  selector:
+    matchLabels:
+      app: oke-sb-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: oke-sb-demo
+      annotations:
+        provider: oracle
+    spec:
+      containers:
+      - image: fra.ocir.io/sehubemeaprod/spring-projects/spring-boot1:latest
+        name: oke-sb-demo
+        imagePullPolicy: Always
+        ports:
+          - name: oke-sb-demo
+            containerPort: 8080
+            protocol: TCP
+        volumeMounts:
+        - name: data
+          mountPath: /usr/share/nginx/html
+        env:
+          - name: SPRING_APPLICATION_JSON
+            valueFrom:
+              configMapKeyRef:
+                name: oci-config
+                key: oci-config.json  
+          - name: APM_ATTRIBUTES_K8S_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: APM_ATTRIBUTES_K8S_NAMESPACE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: APM_ATTRIBUTES_K8S_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mynginxclaim2
+      imagePullSecrets:
+        - name: ocirsecret3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oke-sb-lb
+  labels:
+    app: oke-sb-demo
+  annotations:
+    service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "100"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+  selector:
+    app: oke-sb-demo
+      
